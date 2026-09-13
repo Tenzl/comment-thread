@@ -1,0 +1,35 @@
+# Catalog sản phẩm + link affiliate: dữ liệu riêng, không đưa lên git.
+# Extension vẫn đọc file này trên máy, chỉ là git không theo dõi nó.
+data/seeding.xlsx
+
+# File khoá tạm Excel/Word tạo ra khi đang mở file (vd data/~$seeding.xlsx)
+~$*
+*.tmp
+
+# Đóng gói extension: file .pem là private key ký extension, tuyệt đối không commit
+*.pem
+*.crx
+*.zip
+
+# Bí mật
+.env
+.env.*
+
+# Node (nếu sau này có build/test)
+node_modules/
+npm-debug.log*
+
+# Hệ điều hành
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code: cấu hình cục bộ trên máy
+.claude/settings.local.json

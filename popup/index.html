@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>Affiliate Finder</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <h1>Affiliate Finder</h1>
+      <label class="switch" title="Bật/tắt panel khi bấm vào ô bình luận">
+        <input id="enabled" type="checkbox" />
+        <span class="track"><span class="thumb"></span></span>
+        <span id="enabledText" class="switch-text">Đang bật</span>
+      </label>
+      <button id="options" class="icon" title="Cài đặt" aria-label="Cài đặt">⚙</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat-row">
+        <div class="stat"><span id="totalOpened" class="num">0</span><span class="lbl">Đã mở</span></div>
+        <div class="stat"><span id="totalPosted" class="num">0</span><span class="lbl">Đã đăng</span></div>
+      </div>
+      <p class="hint">Mở = bài đã bấm Tạo cho AI soạn. Đăng = bài bạn đã bấm Post comment đó.</p>
+    </section>
+
+    <section class="catalog">
+      <div class="catalog-line">
+        <span id="catalogInfo" class="dim">Đang kiểm tra catalog…</span>
+        <button id="reload" title="Đọc lại file Excel ngay">Reload catalog</button>
+      </div>
+      <p id="catalogCats" class="cats"></p>
+      <p id="catalogMsg" class="msg" hidden></p>
+    </section>
+
+    <section class="posted">
+      <div class="posted-head">
+        <h2>Bài đã đăng <span id="postedCount" class="pill">0</span></h2>
+        <button id="copyLinks" title="Chép link tất cả bài, mỗi link một dòng">Chép tất cả link</button>
+      </div>
+      <ul id="postedList"></ul>
+      <p id="postedEmpty" class="empty">Chưa có bài nào. Bấm Post một comment do extension soạn là bài đó sẽ hiện ở đây.</p>
+    </section>
+
+    <script src="index.js"></script>
+  </body>
+</html>

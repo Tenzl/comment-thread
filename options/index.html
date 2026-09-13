@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Threads Affiliate Finder — Settings</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Threads Affiliate Finder</h1>
+
+      <section>
+        <h2>Catalog sản phẩm</h2>
+        <p class="hint">
+          Mặc định đọc <code>data/seeding.xlsx</code> trong thư mục extension. Mỗi sheet là một
+          danh mục, dòng tiêu đề có các cột <code>STT, Tên sản phẩm, Link rút gọn, Note</code>.
+          Cột <code>Note</code> là mô tả sản phẩm gửi cho AI. Sửa file rồi Save trong Excel là
+          extension tự nạp lại (khi mở popup, khi Chrome khởi động, hoặc trước lần gọi AI kế tiếp).
+        </p>
+
+        <label for="catalogPath">Đường dẫn file .xlsx khác <span class="hint-inline">để trống để dùng data/seeding.xlsx</span></label>
+        <input id="catalogPath" type="text" placeholder="D:\Seeding-media\seeding.xlsx" />
+
+        <div class="row">
+          <button id="reloadCatalog" class="primary">Lưu đường dẫn &amp; Reload catalog</button>
+        </div>
+
+        <p id="catalogStatus" class="status"></p>
+
+        <div id="fileHelp" class="warn" hidden>
+          <strong>Chưa bật quyền đọc file.</strong>
+          Vào <code>chrome://extensions</code>, mở <em>Details</em> của extension này và bật
+          <em>"Allow access to file URLs"</em>. Chỉ cần làm một lần.
+        </div>
+      </section>
+
+      <section>
+        <h2>DeepSeek API</h2>
+        <label for="apiKey">API key</label>
+        <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+
+        <label for="model">Model</label>
+        <input id="model" type="text" />
+
+        <label for="apiBase">Endpoint</label>
+        <input id="apiBase" type="text" />
+
+        <div class="row">
+          <button id="testConn">Test kết nối</button>
+        </div>
+        <p id="connStatus" class="status"></p>
+      </section>
+
+      <section>
+        <h2>Chung</h2>
+        <label class="check">
+          <input id="enabled" type="checkbox" />
+          Bật panel khi bấm vào ô bình luận
+        </label>
+        <label class="check">
+          <input id="debug" type="checkbox" />
+          In log gỡ lỗi ra Console
+        </label>
+      </section>
+
+      <section>
+        <h2>Sinh comment</h2>
+        <label for="maxOpComments">Số comment tối đa của chủ post gửi lên AI</label>
+        <input id="maxOpComments" type="number" min="1" max="50" />
+
+
+        <label for="temperature">Temperature</label>
+        <input id="temperature" type="number" step="0.1" min="0" max="2" />
+
+        <label for="systemPrompt">
+          System prompt
+          <span class="hint-inline">để trống để dùng prompt mặc định</span>
+        </label>
+        <textarea id="systemPrompt" rows="16" placeholder="(đang dùng prompt mặc định)"></textarea>
+        <div class="row">
+          <button id="loadDefaultPrompt">Chép prompt mặc định vào ô</button>
+          <button id="clearPrompt">Quay lại mặc định</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Nhật ký AI</h2>
+        <p class="hint">
+          Mỗi lần gọi AI đều được ghi lại, giữ 50 lần gần nhất. Mở một mục để xem
+          nguyên nội dung đã gửi lên và JSON thô model trả về. Comment không đúng ý
+          thì nhìn vào đây để biết sai ở bước nào: gửi thiếu dữ liệu hay model viết dở.
+        </p>
+        <div class="row">
+          <button id="refreshLog">Tải lại nhật ký</button>
+          <button id="clearLog" class="danger">Xoá nhật ký</button>
+        </div>
+        <div id="aiLog" class="log"></div>
+      </section>
+
+      <div class="savebar">
+        <button id="save" class="primary">Lưu</button>
+        <span id="saveStatus" class="status"></span>
+      </div>
+    </main>
+
+    <script type="module" src="index.js"></script>
+  </body>
+</html>

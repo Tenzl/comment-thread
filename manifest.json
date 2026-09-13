@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Threads Affiliate Finder",
+  "version": "2.0.0",
+  "description": "Bam vao o binh luan tren Threads, chon danh muc, AI chon san pham affiliate va soan comment goi y.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://www.threads.com/*",
+    "https://www.threads.net/*",
+    "https://api.deepseek.com/*",
+    "file:///*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.threads.com/*", "https://www.threads.net/*"],
+      "run_at": "document_idle",
+      "js": [
+        "content/namespace.js",
+        "content/selectors.js",
+        "content/post-extractor.js",
+        "content/reply-injector.js",
+        "content/detail-scanner.js",
+        "content/observer.js"
+      ]
+    }
+  ],
+  "options_page": "options/index.html",
+  "action": {
+    "default_title": "Threads Affiliate Finder",
+    "default_popup": "popup/index.html"
+  }
+}
