@@ -16,7 +16,7 @@ A. NẠP CATALOG (không gọi AI)
         ↓
    giải nén xlsx, đọc từng sheet: mỗi sheet là một DANH MỤC
         ↓
-   mỗi dòng: { id "sheet-STT", tên, danh mục, mô tả = cột Note, link }
+   mỗi dòng: { id "sheet-STT", tên, danh mục, giá = cột Giá, mô tả = cột Mô tả, note = cột Note, link }
         ↓
    lưu vào chrome.storage
 
@@ -29,7 +29,7 @@ B. SINH COMMENT (đúng 1 request mỗi lần bấm Tạo)
         ↓
    gửi DeepSeek:
      system = prompt + DANH SÁCH SẢN PHẨM của các danh mục đã chọn, nhóm theo "## tên danh mục"
-              "2-1 | Kẹp mi WOSADO | <mô tả từ cột Note>"
+              "2-1 | Kẹp mi WOSADO | giá: 89k | mô tả: ... | note: ..."
      user   = bài viết + phần chủ post nói thêm
         ↓
    AI trả {products: [{productId, label}] tối đa N món, comment, reason}
@@ -73,7 +73,7 @@ Mỗi **sheet là một danh mục**, tên sheet chính là tên hiển thị tr
 | Dòng | Nội dung |
 |---|---|
 | 1 | tiêu đề tuỳ ý, ví dụ `Link rút gọn - CHĂM SÓC DA` |
-| 2 | dòng tiêu đề cột: `STT \| Tên sản phẩm \| Link rút gọn \| Note` |
+| 2 | dòng tiêu đề cột: `STT \| Tên sản phẩm \| Link rút gọn \| Mô tả \| Giá \| Note` |
 | 3 trở đi | mỗi dòng một sản phẩm |
 
 | Cột | Dùng để |
@@ -81,22 +81,35 @@ Mỗi **sheet là một danh mục**, tên sheet chính là tên hiển thị tr
 | `STT` | tạo mã sản phẩm `<số thứ tự sheet>-<STT>`, ví dụ `2-15` |
 | `Tên sản phẩm` | gửi cho AI, hiện trên panel |
 | `Link rút gọn` | link gắn vào cuối comment. Ô không phải URL thì lấy hyperlink của ô |
-| `Note` | **mô tả sản phẩm** gửi cho AI |
+| `Giá` | tuỳ chọn. Số (`89000`) hoặc chữ (`89k`, `89.000đ`, `1,2tr`). Xem mục yếu tố giá bên dưới |
+| `Mô tả` | **thông tin sản phẩm** gửi cho AI: công dụng, hợp với ai, cảm giác khi dùng |
+| `Note` | **lời dặn AI** cách viết về riêng món này, đóng vai prompt cho từng sản phẩm |
 
 Extension tìm dòng tiêu đề trong 10 dòng đầu theo chữ "Tên sản phẩm" và "Link", nên thêm dòng
 tiêu đề phía trên không làm hỏng việc đọc. Dòng thiếu tên hoặc thiếu link bị bỏ qua.
 Thêm sheet mới có đúng dòng tiêu đề là có thêm danh mục mới.
 
-### Cột Note quyết định chất lượng comment
+### Cột Mô tả và Note quyết định chất lượng comment
 
-AI được dặn chỉ kể những gì tên và mô tả cho biết, không bịa công dụng. Note trống thì AI chỉ
-đoán công dụng qua tên. Nên viết ngắn: công dụng chính, hợp với ai, cảm giác khi dùng.
+Mỗi cột một vai trò, đừng trộn:
 
-```
-Kem dưỡng ẩm cho da khô, thấm nhanh không bết, dùng được cả ngày lẫn đêm
-```
+- **Mô tả** là sự thật về sản phẩm. AI chỉ kể những gì tên và mô tả cho biết, không bịa công dụng.
+  Mô tả trống thì AI đoán công dụng qua tên.
+  ```
+  Kem dưỡng ẩm cho da khô, thấm nhanh không bết, dùng được cả ngày lẫn đêm
+  ```
+- **Note** là lời dặn cách viết về món này: nên nhấn điểm nào, hợp bài kiểu nào, tránh nói gì.
+  Note không thêm được công dụng ngoài mô tả và không đè được các quy tắc chung của prompt.
+  ```
+  nhấn vụ không bết, hợp bài than da khô mùa lạnh, đừng nói trị mụn
+  ```
+- **Giá** ghi riêng ở cột `Giá`. Giá nằm trong Mô tả hay Note thì AI không bao giờ dùng.
 
-Không cần ghi giá. Có ghi thì AI cũng bị cấm đưa giá vào comment.
+### Yếu tố giá
+
+AI chỉ nhắc giá của một món khi đủ cả 3 điều: chủ post nói tầm giá bằng con số rõ ràng
+("dưới 200k", "tầm 150k"), món có giá ở cột `Giá`, và giá món thấp hơn hoặc bằng tầm đó.
+Chủ post không nói tầm giá, hoặc giá món cao hơn, thì comment không nhắc gì tới tiền.
 
 ### Sửa file thì tự cập nhật
 
@@ -150,7 +163,7 @@ https://s.shopee.vn/...         son bbia: https://s.shopee.vn/...
 
 Nhiều link thì mỗi dòng có tên lóng đứng trước để người đọc biết link nào là món nào.
 
-### Prompt: giọng gen Z, không giá
+### Prompt: giọng gen Z
 
 Trên Threads, comment nghe như AI hoặc quảng cáo (câu tròn trịa, khen có cấu trúc, có giá, có lời mời)
 bị lướt qua, bị report. Vì vậy prompt mặc định bắt AI đóng vai một người dùng gen Z gõ vội:
@@ -161,7 +174,7 @@ bị lướt qua, bị report. Vì vậy prompt mặc định bắt AI đóng va
 - Kể ngôi thứ nhất về việc chính mình xài, đôi khi than vặt một điểm trừ nhỏ (bao bì, mấy bữa đầu) cho thật.
 - Có ví dụ đúng giọng và ví dụ **sai giọng** để AI tránh văn phong kiểu "tình trạng", "sử dụng",
   "cải thiện đáng kể", "phù hợp với nhu cầu", liệt kê ưu nhược.
-- **Cấm** giá, số tiền, "rẻ", "sale", "giảm giá", "voucher", "freeship", lời mời chào, link, tên sàn.
+- **Cấm** giá và số tiền (trừ trường hợp ở mục yếu tố giá), "sale", "giảm giá", "voucher", "freeship", lời mời chào kiểu người bán, link, tên sàn.
 - Link do extension tự tra từ mã sản phẩm rồi ghép vào cuối. AI bị cấm tự chèn link vì nó sẽ bịa URL.
 
 Prompt mặc định nằm trong `background/ai-service.js`, chỉnh được trong Settings mà không phải sửa code.
@@ -190,7 +203,7 @@ Settings có mục **Nhật ký AI** giữ 50 lần gọi gần nhất, mỗi m�
 
 Khi comment ra không đúng ý, đây là chỗ để biết sai ở bước nào: gửi thiếu dữ liệu lên,
 hay dữ liệu đủ mà model viết dở. Hai trường hợp này sửa hai chỗ khác nhau: một bên
-sửa selector hoặc cột Note, một bên sửa prompt.
+sửa selector hoặc cột Mô tả / Note, một bên sửa prompt.
 
 ## Chèn vào ô soạn của Threads
 

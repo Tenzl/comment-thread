@@ -23,6 +23,13 @@ function formatLinks(chosen) {
     .join('\n');
 }
 
+// Cau mo, moi mon mot dong "URL cam nhan", cau chot.
+// Mon nao AI khong viet line thi dong do chi co URL.
+function assembleComment(intro, chosen, outro) {
+  const lines = chosen.map(({ product, line }) => (product.url + ' ' + (line || '')).trim());
+  return [intro, ...lines, outro].filter(Boolean).join('\n');
+}
+
 function shortName(name) {
   return String(name).split(/\s+/).slice(0, 4).join(' ').toLowerCase();
 }
@@ -106,7 +113,7 @@ const handlers = {
       }
       if (seen.has(product.id) || chosen.length >= result.maxLinks) continue;
       seen.add(product.id);
-      chosen.push({ product, label: pick.label });
+      chosen.push({ product, label: pick.label, line: pick.line });
     }
     const productId = (chosen.length ? chosen.map((c) => c.product.id) : rejected).join(', ');
 
@@ -117,14 +124,22 @@ const handlers = {
       await aiLog.append({ ...logBase, productId, error: m });
       throw new Error(m);
     }
-    if (!result.comment) {
+    // Dang moi: AI tra intro / line tung mon / outro. Dang cu: ca comment mot cuc.
+    const structured = !!(result.intro || chosen.some((c) => c.line));
+    // Ban chu chua gan link, de ghi log va kiem tra rong.
+    const plain = structured
+      ? [result.intro, ...chosen.map((c) => c.line), result.outro].filter(Boolean).join('\n')
+      : result.comment;
+    if (!plain) {
       const m = 'AI tra ve comment rong.';
       await aiLog.append({ ...logBase, productId, error: m });
       throw new Error(m);
     }
 
     // Extension tu ghep link tu productId. Neu de AI tu chen, no se bia URL.
-    const comment = result.comment + '\n\n' + formatLinks(chosen);
+    const comment = structured
+      ? assembleComment(result.intro, chosen, result.outro)
+      : result.comment + '\n\n' + formatLinks(chosen);
     const productName = chosen.map((c) => c.product.name).join(' + ');
 
     await aiLog.append({
@@ -132,7 +147,7 @@ const handlers = {
       productId,
       productName,
       rejected: rejected.length ? rejected : undefined,
-      comment: result.comment,
+      comment: plain,
       finalComment: comment,
       outcome: 'filled',
     });

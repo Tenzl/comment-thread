@@ -183,11 +183,28 @@ function findHeader(rows) {
         stt: cells.findIndex((c) => c === 'stt'),
         name,
         link,
-        note: cells.findIndex((c) => c === 'note' || c.includes('mo ta')),
+        // Mo ta: thong tin san pham. Note: loi dan AI cach viet ve rieng mon nay.
+        desc: cells.findIndex((c) => c.includes('mo ta')),
+        note: cells.findIndex((c) => c === 'note' || c.includes('ghi chu')),
+        price: cells.findIndex((c) => /^gia\b/.test(c)),
       };
     }
   }
   return null;
+}
+
+// O gia co the la so (89000) hoac chu ("89k", "89.000đ", "1,2tr"). Doi ve so dong.
+// Khong doc duoc thi tra null, san pham van dung duoc nhung khong co yeu to gia.
+export function parsePrice(v) {
+  const s = norm(v).replace(/\s+/g, '');
+  if (!s) return null;
+  const m = /^(\d+(?:[.,]\d+)?)(k|tr|trieu)\b/.exec(s);
+  if (m) {
+    const n = Number(m[1].replace(',', '.'));
+    return Math.round(n * (m[2] === 'k' ? 1000 : 1000000)) || null;
+  }
+  const n = Number(s.replace(/[^\d]/g, ''));
+  return n > 0 ? n : null;
 }
 
 // Doc toan bo workbook thanh { products, categories }.
@@ -244,7 +261,9 @@ export async function parseCatalogXlsx(buf) {
         id,
         name,
         category,
-        description: h.note !== -1 ? String(cells[h.note] || '').trim() : '',
+        description: h.desc !== -1 ? String(cells[h.desc] || '').trim() : '',
+        note: h.note !== -1 ? String(cells[h.note] || '').trim() : '',
+        price: h.price !== -1 ? parsePrice(cells[h.price]) : null,
         url,
       });
       count++;

@@ -1,7 +1,3 @@
-# Catalog sản phẩm + link affiliate: dữ liệu riêng, không đưa lên git.
-# Extension vẫn đọc file này trên máy, chỉ là git không theo dõi nó.
-data/seeding.xlsx
-
 # File khoá tạm Excel/Word tạo ra khi đang mở file (vd data/~$seeding.xlsx)
 ~$*
 *.tmp

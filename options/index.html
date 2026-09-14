@@ -14,8 +14,10 @@
         <h2>Catalog sản phẩm</h2>
         <p class="hint">
           Mặc định đọc <code>data/seeding.xlsx</code> trong thư mục extension. Mỗi sheet là một
-          danh mục, dòng tiêu đề có các cột <code>STT, Tên sản phẩm, Link rút gọn, Note</code>.
-          Cột <code>Note</code> là mô tả sản phẩm gửi cho AI. Sửa file rồi Save trong Excel là
+          danh mục, dòng tiêu đề có các cột <code>STT, Tên sản phẩm, Link rút gọn, Mô tả, Giá, Note</code>.
+          <code>Mô tả</code>: thông tin sản phẩm (công dụng, hợp với ai). <code>Giá</code>: chỉ được nhắc
+          khi chủ post nói tầm giá và giá món không vượt tầm đó. <code>Note</code>: dặn AI cách viết
+          về riêng món này (nhấn điểm nào, hợp bài kiểu nào, tránh nói gì). Ba cột này đều tuỳ chọn. Sửa file rồi Save trong Excel là
           extension tự nạp lại (khi mở popup, khi Chrome khởi động, hoặc trước lần gọi AI kế tiếp).
         </p>
 
