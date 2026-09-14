@@ -11,7 +11,6 @@
     TIME: 'time[datetime]',
     MEDIA: 'img[alt^="Photo by @"]',
     COMPOSER: 'div[contenteditable="true"][data-lexical-editor="true"][role="textbox"]',
-    ROOT_PAGELET: '[data-pagelet="threads_post_page_0"]',
     ANY_PAGELET: '[data-pagelet^="threads_post_page"]',
   };
 

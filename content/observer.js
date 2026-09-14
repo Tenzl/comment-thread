@@ -86,6 +86,7 @@
         type: 'GENERATE_COMMENT',
         payload: {
           post: collected.post,
+          parents: collected.parents,
           opComments: collected.opComments,
           categories,
           maxLinks: TAF.settings.maxLinks,

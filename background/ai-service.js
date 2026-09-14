@@ -204,8 +204,16 @@ export function formatPrice(n) {
   return n + 'đ';
 }
 
-export function buildUserMessage({ post, opComments, maxLinks }) {
+export function buildUserMessage({ post, parents, opComments, maxLinks }) {
   const lines = [];
+
+  // Mo link cua mot comment: bai cha phia tren chi de hieu ngu canh,
+  // comment van tra loi BÀI VIẾT ben duoi.
+  if (parents && parents.length) {
+    lines.push('NGỮ CẢNH PHÍA TRÊN (bài cha, chỉ để hiểu, bạn đang trả lời BÀI VIẾT bên dưới)');
+    for (const p of parents) lines.push('@' + p.author + ': ' + p.text);
+    lines.push('');
+  }
 
   lines.push('BÀI VIẾT');
   lines.push('@' + post.author + ': ' + post.text);
