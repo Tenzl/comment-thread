@@ -200,6 +200,7 @@ const handlers = {
       changed: !!r.changed,
       count: settings.catalogCount || 0,
       categories: await catalog.getCategories(),
+      skipped: settings.catalogSkipped || [],
     };
   },
 

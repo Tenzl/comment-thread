@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS = {
   enabled: true,
   catalogPath: '', // rong = dung data/seeding.xlsx dong goi san
   lastCategories: [],
+  catalogSkipped: [], // sheet bi bo qua lan nap gan nhat: [{ sheet, reason }]
   maxLinks: 1, // so link (so san pham) toi da trong mot comment
   debug: false,
   maxOpComments: 10,

@@ -12,6 +12,7 @@
     enabled: true,
     catalogPath: '',
     lastCategories: [],
+    catalogSkipped: [],
     maxLinks: 1, // so link (so san pham) toi da trong mot comment
     debug: false,
     maxOpComments: 10,

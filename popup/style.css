@@ -285,3 +285,9 @@ button.icon {
     transition: none;
   }
 }
+
+.ver {
+  font-size: 11px;
+  color: #888;
+  margin-left: 4px;
+}

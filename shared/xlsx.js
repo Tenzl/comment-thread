@@ -175,7 +175,8 @@ function findHeader(rows) {
   const nums = [...rows.keys()].sort((a, b) => a - b).slice(0, 10);
   for (const r of nums) {
     const cells = (rows.get(r) || []).map(norm);
-    const name = cells.findIndex((c) => c.includes('ten san pham'));
+    // Cot ten: moi sheet dat mot kieu (Ten san pham / Ten shop / Ten SP / Ten...).
+    const name = cells.findIndex((c) => /^ten\b/.test(c) || c.includes('ten san pham'));
     const link = cells.findIndex((c) => c.includes('link'));
     if (name !== -1 && link !== -1) {
       return {
@@ -221,6 +222,7 @@ export async function parseCatalogXlsx(buf) {
 
   const products = [];
   const categories = [];
+  const skipped = []; // Sheet bi bo qua + ly do, de bao ra UI.
   const usedIds = new Set();
 
   const sheetTags = workbook.match(/<sheet\b[^>]*>/g) || [];
@@ -229,19 +231,31 @@ export async function parseCatalogXlsx(buf) {
   for (const tag of sheetTags) {
     sheetIndex++;
     // Sheet an (Hide) trong Excel khong thanh danh muc.
-    if (attr(tag, 'state') === 'hidden' || attr(tag, 'state') === 'veryHidden') continue;
     const category = (attr(tag, 'name') || 'Sheet ' + sheetIndex).trim();
+    if (attr(tag, 'state') === 'hidden' || attr(tag, 'state') === 'veryHidden') {
+      skipped.push({ sheet: category, reason: 'sheet dang an (Hide) trong Excel' });
+      continue;
+    }
     const target = wbRels[attr(tag, 'r:id')];
-    if (!target) continue;
+    if (!target) {
+      skipped.push({ sheet: category, reason: 'file .xlsx thieu quan he toi sheet nay' });
+      continue;
+    }
 
     const path = target.startsWith('/') ? target.slice(1) : 'xl/' + target.replace(/^\.\//, '');
     const xml = await read(path);
-    if (!xml) continue;
+    if (!xml) {
+      skipped.push({ sheet: category, reason: 'khong doc duoc ' + path });
+      continue;
+    }
 
     const relsPath = path.replace(/([^/]+)$/, '_rels/$1.rels');
     const { rows, links } = parseSheet(xml, strings, parseRels(await read(relsPath)));
     const h = findHeader(rows);
-    if (!h) continue;
+    if (!h) {
+      skipped.push({ sheet: category, reason: 'khong thay dong tieu de co cot "Ten..." va "Link"' });
+      continue;
+    }
 
     let count = 0;
     const rowNums = [...rows.keys()].filter((r) => r > h.row).sort((a, b) => a - b);
@@ -270,6 +284,7 @@ export async function parseCatalogXlsx(buf) {
     }
 
     if (count) categories.push({ name: category, count });
+    else skipped.push({ sheet: category, reason: 'co tieu de nhung khong dong nao co ten + link http' });
   }
 
   if (!products.length) {
@@ -277,7 +292,7 @@ export async function parseCatalogXlsx(buf) {
       'Khong doc duoc san pham nao. Moi sheet can dong tieu de co cot "Tên sản phẩm" va "Link".'
     );
   }
-  return { products, categories };
+  return { products, categories, skipped };
 }
 
 export async function sha256(buf) {

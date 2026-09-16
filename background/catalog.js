@@ -45,7 +45,7 @@ async function doRefresh(force) {
   const { products } = await chrome.storage.local.get('products');
   const source = settings.catalogPath || BUNDLED_PATH;
   if (!force && hash === settings.catalogHash && source === settings.catalogSource && products?.length) {
-    return { changed: false, count: products.length };
+    return { changed: false, count: products.length, skipped: settings.catalogSkipped || [] };
   }
 
   const parsed = await parseCatalogXlsx(buf);
@@ -55,9 +55,13 @@ async function doRefresh(force) {
     catalogSource: source,
     catalogLoadedAt: Date.now(),
     catalogCount: parsed.products.length,
+    catalogSkipped: parsed.skipped,
   });
   console.log('[TAF] nap catalog', source, parsed.products.length, 'san pham');
-  return { changed: true, count: parsed.products.length };
+  if (parsed.skipped?.length) {
+    for (const s of parsed.skipped) console.warn('[TAF] bo qua sheet "' + s.sheet + '": ' + s.reason);
+  }
+  return { changed: true, count: parsed.products.length, skipped: parsed.skipped };
 }
 
 export function refreshIfChanged({ force = false, throttle = false } = {}) {

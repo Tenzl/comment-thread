@@ -41,9 +41,16 @@ async function loadStats() {
   $('totalPosted').textContent = s.total.posted || 0;
 }
 
+// Hien version + duong dan thu muc extension: de biet Chrome dang chay ban nao.
+function showVersion() {
+  const m = chrome.runtime.getManifest();
+  $('version').textContent = 'v' + m.version;
+  $('version').title = chrome.runtime.getURL('');
+}
+
 // ---------- Catalog ----------
 
-function showCatalog(settings, categories) {
+function showCatalog(settings, categories, skipped) {
   const n = settings.catalogCount || 0;
   const source = settings.catalogPath
     ? settings.catalogPath.split(/[\\/]/).pop()
@@ -56,6 +63,14 @@ function showCatalog(settings, categories) {
   $('catalogCats').textContent = (categories || [])
     .map((c) => c.name + ' (' + c.count + ')')
     .join(' · ');
+
+  // Sheet co trong file nhung khong nap duoc: noi ro ten + ly do.
+  const list = skipped || settings.catalogSkipped || [];
+  const el = $('catalogSkipped');
+  el.textContent = list.length
+    ? 'Bỏ qua ' + list.length + ' sheet: ' + list.map((s) => s.sheet + ' — ' + s.reason).join(' · ')
+    : '';
+  el.hidden = !list.length;
 }
 
 async function refreshCatalog(force) {
@@ -74,7 +89,7 @@ async function refreshCatalog(force) {
   } else {
     catalogMsg('');
   }
-  showCatalog((s && s.settings) || {}, res && res.categories);
+  showCatalog((s && s.settings) || {}, res && res.categories, res && res.skipped);
 }
 
 $('reload').addEventListener('click', () => refreshCatalog(true));
@@ -150,6 +165,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 (async function init() {
+  showVersion();
   const res = await send({ type: 'GET_SETTINGS' });
   const settings = (res && res.settings) || {};
   showEnabled(settings.enabled !== false);
